@@ -1,11 +1,25 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
 
-export const connectDB = async () => {
+dotenv.config();
+
+const uri = process.env.MONGO_URI;
+if (!uri) throw new Error("MONGODB_URI не знайдено в .env");
+
+const client = new MongoClient(uri);
+let db;
+
+export async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB підключено");
+    await client.connect();
+    db = client.db("test"); // назва твоєї БД
+    console.log("MongoDB connected");
   } catch (err) {
-    console.error("Помилка підключення до MongoDB:", err);
-    process.exit(1);
+    console.error("MongoDB connection error:", err);
   }
-};
+}
+
+export function getDB() {
+  if (!db) throw new Error("DB не підключено");
+  return db;
+}

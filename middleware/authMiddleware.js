@@ -1,15 +1,18 @@
-import admin from "../config/firebase.js";
+import { authAdmin } from "../config/firebase.js";
 
 export const verifyToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // "Bearer <token>"
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ message: "Немає токена" });
 
+  const token = header.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Немає токена" });
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.user = decoded; // додаємо дані користувача
+    const decoded = await authAdmin.verifyIdToken(token);
+    req.user = decoded; // decoded.uid буде доступний
     next();
   } catch (err) {
+    console.error(err);
     res.status(403).json({ message: "Недійсний токен" });
   }
 };

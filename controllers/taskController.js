@@ -1,16 +1,31 @@
-import Task from "../models/Task.js";
+import { getDB } from "../config/db.js";
 
-export const getTasks = async (req, res) => {
-  const tasks = await Task.find({ userId: req.user.uid });
-  res.json(tasks);
-};
+export async function getTasks(userId) {
+  const db = getDB();
+  const tasks = await db.collection("tasks").find({ userId }).toArray();
+  return tasks;
+}
 
-export const addTask = async (req, res) => {
-  const task = await Task.create({ ...req.body, userId: req.user.uid });
-  res.status(201).json(task);
-};
 
-export const deleteTask = async (req, res) => {
-  await Task.findOneAndDelete({ _id: req.params.id, userId: req.user.uid });
-  res.json({ message: "Видалено" });
-};
+
+export async function addTask(task) {
+  const db = getDB();
+  const result = await db.collection("tasks").insertOne(task);
+  return result; // result.insertedId
+}
+
+export async function updateTask(taskId, updateData) {
+  const db = getDB();
+  const result = await db
+    .collection("tasks")
+    .updateOne({ _id: new ObjectId(taskId) }, { $set: updateData });
+  return result; // result.modifiedCount
+}
+
+export async function deleteTask(taskId) {
+  const db = getDB();
+  const result = await db
+    .collection("tasks")
+    .deleteOne({ _id: new ObjectId(taskId) });
+  return result; // result.deletedCount
+}

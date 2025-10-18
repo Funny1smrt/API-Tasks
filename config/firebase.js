@@ -1,8 +1,15 @@
+import fs from "fs";
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
 
+// Читаємо ключ
+const serviceAccount = JSON.parse(
+  fs.readFileSync(new URL("./serviceAccountKey.json", import.meta.url))
+);
+
+// Ініціалізація Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-export default admin;
+// Експортуємо тільки admin для Auth
+export const authAdmin = admin.auth();
