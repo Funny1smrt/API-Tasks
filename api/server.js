@@ -18,7 +18,9 @@ const startServer = async () => {
   app.use("/api/blocks", blockRoutes);
 
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`🚀 Сервер запущено на порті ${PORT}`));
+  app.listen(PORT, () =>
+    console.log(`🚀 Сервер запущено на http://localhost:${PORT}`)
+  );
 };
 
 startServer();
