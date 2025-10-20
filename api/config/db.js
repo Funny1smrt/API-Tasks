@@ -13,7 +13,7 @@ export async function connectDB() {
   try {
     await client.connect();
     db = client.db("test"); // назва твоєї БД
-    console.log("MongoDB connected");
+    console.log("MongoDB connected to db: ", db.databaseName);
   } catch (err) {
     console.error("MongoDB connection error:", err);
   }

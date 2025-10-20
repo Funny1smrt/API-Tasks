@@ -38,3 +38,5 @@ coverage/
 # Optional OS files
 *.swp
 *.swo
+
+*.mongodb.js
