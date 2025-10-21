@@ -6,7 +6,7 @@ import {
   updateBlock,
 } from "../controllers/blockController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
-import { ObjectId } from "mongodb"; // Потрібно для роботи з ObjectId
+
 
 const router = express.Router();
 

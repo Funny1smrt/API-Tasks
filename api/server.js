@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import noteRoutes from "./routes/notes.js";
 import blockRoutes from "./routes/blocks.js";
 import userRoutes from "./routes/users.js";
+import avatarRoutes from "./routes/avatars.js";
 dotenv.config();
 const app = express();
 
@@ -16,7 +17,15 @@ const startServer = async () => {
   app.use("/api/users", userRoutes);
   app.use("/api/notes", noteRoutes);
   app.use("/api/blocks", blockRoutes);
-
+  app.use("/api/avatars", avatarRoutes);
+  app.use((err, req, res, next) => {
+    console.error(err.stack); // Для налагодження
+    const statusCode = err.status || 500;
+    res.status(statusCode).json({
+      message: err.message || "Сталася внутрішня помилка сервера",
+      error: process.env.NODE_ENV === "production" ? {} : err.stack,
+    });
+  });
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () =>
     console.log(`🚀 Сервер запущено на http://localhost:${PORT}`)
