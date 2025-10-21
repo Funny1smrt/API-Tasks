@@ -12,6 +12,8 @@ export async function getUser(userId) {
     return user;
 }
 
+
+
 export async function updateUser(userId, updateData) {
     const db = getDB();
     const result = await db
