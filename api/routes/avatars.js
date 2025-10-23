@@ -20,11 +20,9 @@ router.get("/", verifyToken, async (req, res, next) => {
         .json({ message: "Unauthorized: Missing user ID." });
     }
 
-    // 🛑 ПЕРЕДАЄМО ТОКЕН у контролер
     const result = await getAvatar(userId);
 
-    // ✅ Виправлено повідомлення про успіх
-    res.status(200).json({ message: "Аватари успішно отримано", result });
+    res.status(200).json({ message: "Аватар успішно отримано", result });
   } catch (err) {
     next(err);
   }
@@ -40,7 +38,7 @@ router.post(
   async (req, res, next) => {
     try {
       const userId = req.user.uid || req.user._id;
-      // 🛑 Перевірка наявності файлу (проблема 400 Bad Request)
+
       if (!req.file) {
         return res
           .status(400)
@@ -53,7 +51,7 @@ router.post(
         return res
           .status(401)
           .json({ message: "Unauthorized: Missing user ID." });
-      } // 🛑 ПЕРЕДАЄМО ТОКЕН у контролер
+      }
 
       const result = await uploadAvatar(userId, req.file);
 

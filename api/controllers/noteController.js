@@ -1,29 +1,49 @@
 import { getDB } from "../config/db.js";
+import { ObjectId } from "mongodb";
 
-export async function getNotes(userId) {
+export async function getNotes(userId, journalId) {
   const db = getDB();
-  const notes = await db.collection("notes").find({ userId }).toArray();
+
+  if (!userId) {
+    throw new Error("userId обов’язковий");
+  }
+
+  const query = { userId };
+
+  if (journalId && journalId !== "undefined") {
+    query.journalId = journalId;
+  } else {
+    query.journalId = { $exists: false };
+  }
+
+  const notes = await db
+    .collection("notes")
+    .find(query)
+    .sort({ createdAt: -1 })
+    .toArray();
+
   return notes;
 }
+
 
 export async function addNote(note) {
   const db = getDB();
   const result = await db.collection("notes").insertOne(note);
-  return result; // result.insertedId
+  return result;
 }
 
 export async function updateNote(noteId, updateData) {
   const db = getDB();
   const result = await db
     .collection("notes")
-    .updateOne({ _id: new ObjectId(noteId) }, { $set: updateData });
-  return result; // result.modifiedCount
+    .updateOne({ _id: new ObjectId(String(noteId)) }, { $set: updateData });
+  return result;
 }
 
 export async function deleteNote(noteId) {
   const db = getDB();
   const result = await db
     .collection("notes")
-    .deleteOne({ _id: new ObjectId(noteId) });
-  return result; // result.deletedCount
+    .deleteOne({ _id: new ObjectId(String(noteId)) });
+  return result;
 }

@@ -3,7 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import noteRoutes from "./routes/notes.js";
-import blockRoutes from "./routes/blocks.js";
+import note_componentRoutes from "./routes/note_components.js";
+import journalRoutes from "./routes/journals.js";
 import userRoutes from "./routes/users.js";
 import avatarRoutes from "./routes/avatars.js";
 dotenv.config();
@@ -16,7 +17,8 @@ const startServer = async () => {
   await connectDB(); // чекаємо на підключення MongoDB
   app.use("/api/users", userRoutes);
   app.use("/api/notes", noteRoutes);
-  app.use("/api/blocks", blockRoutes);
+  app.use("/api/note_components", note_componentRoutes);
+  app.use("/api/journals", journalRoutes);
   app.use("/api/avatars", avatarRoutes);
   app.use((err, req, res, next) => {
     console.error(err.stack); // Для налагодження
