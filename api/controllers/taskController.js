@@ -1,7 +1,7 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
-export async function geTasks(userId) {
+export async function getTasks(userId) {
   const db = getDB();
 
   if (!userId) {

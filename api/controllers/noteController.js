@@ -1,7 +1,7 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
-export async function getNotes(userId, journalId) {
+export async function getNotes(userId, reqQuery={}) {
   const db = getDB();
 
   if (!userId) {
@@ -10,11 +10,15 @@ export async function getNotes(userId, journalId) {
 
   const query = { userId };
 
-  if (journalId && journalId !== "undefined") {
-    query.journalId = journalId;
-  } else {
+  if (reqQuery.journalId && reqQuery.journalId !== "undefined") {
+    query.journalId = reqQuery.journalId;
+  } else if (reqQuery.allNotes) {
+    query.journalId = { $exists: true };
+  }
+  else {
     query.journalId = { $exists: false };
   }
+
 
   const notes = await db
     .collection("notes")

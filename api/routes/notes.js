@@ -15,8 +15,10 @@ router.get("/", verifyToken, async (req, res, next) => {
     // Припускаємо, що verifyToken успішно додає інформацію про користувача до req.user
     // і що у req.user є поле `id` або `_id`
     const userId = req.user.uid || req.user._id;
-    const journalId = req.query.journalId;
-    console.log("journalId", journalId);
+    // const journalId = req.query.journalId;
+    // const allNotes = req.query.allNotes;
+    const reqQuery = req.query;
+
     if (!userId) {
       return res.status(401).json({
         message: "Не вдалося визначити ідентифікатор користувача з токена.",
@@ -25,7 +27,7 @@ router.get("/", verifyToken, async (req, res, next) => {
 
 
     // Викликаємо функцію доступу до даних (DAL)
-    const notes = await getNotes(userId, journalId);
+    const notes = await getNotes(userId, reqQuery);
 
     // Відправляємо лише чисті дані (notes), що запобігає BSONError
     res.status(200).json(notes);
