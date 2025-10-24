@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import taskRoutes from "./routes/tasks.js"
 import noteRoutes from "./routes/notes.js";
 import note_componentRoutes from "./routes/note_components.js";
 import journalRoutes from "./routes/journals.js";
@@ -16,6 +17,7 @@ app.use(express.json());
 const startServer = async () => {
   await connectDB(); // чекаємо на підключення MongoDB
   app.use("/api/users", userRoutes);
+  app.use("/api/tasks", taskRoutes);
   app.use("/api/notes", noteRoutes);
   app.use("/api/note_components", note_componentRoutes);
   app.use("/api/journals", journalRoutes);
