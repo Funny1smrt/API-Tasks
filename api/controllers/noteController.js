@@ -1,7 +1,7 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
-export async function getNotes(userId, reqQuery={}) {
+export async function getNotes(userId, reqQuery = {}) {
   const db = getDB();
 
   if (!userId) {
@@ -9,16 +9,20 @@ export async function getNotes(userId, reqQuery={}) {
   }
 
   const query = { userId };
+  const jId = reqQuery.journalId;
+  // --- 1. Фільтрація за Journal ID та All Notes ---
 
-  if (reqQuery.journalId && reqQuery.journalId !== "undefined") {
-    query.journalId = reqQuery.journalId;
-  } else if (reqQuery.allNotes) {
+  if (jId && jId !== "undefined") {
+    // ВИПАДОК А: Завантажуємо нотатки для КОНКРЕТНОГО ВІДКРИТОГО ЖУРНАЛУ
+    query.journalId = jId;
+  } else if (reqQuery.allNotes && reqQuery.allNotes !== "false") {
+    // ВИПАДОК B: Завантажуємо ВСІ нотатки, які ПРИВ'ЯЗАНІ до БУДЬ-ЯКОГО журналу
     query.journalId = { $exists: true };
+  } else {
+    // ВИПАДОК С: Завантажуємо "ВІЛЬНІ" нотатки (які НЕ належать жодному журналу)
+    // Цей випадок зазвичай використовується для загального списку або "Inbox".
+    return;
   }
-  else {
-    query.journalId = { $exists: false };
-  }
-
 
   const notes = await db
     .collection("notes")
@@ -28,7 +32,6 @@ export async function getNotes(userId, reqQuery={}) {
 
   return notes;
 }
-
 
 export async function addNote(note) {
   const db = getDB();

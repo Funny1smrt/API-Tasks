@@ -25,3 +25,12 @@ export const verifyToken = (req, res, next) => {
     res.status(403).json({ message: "Недійсний або прострочений токен" });
   }
 };
+export const verifyTokenUserId = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    return decoded.uid;
+  } catch (err) {
+    console.error("JWT verify error:", err.message);
+    return null;
+  }
+}

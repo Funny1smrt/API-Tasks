@@ -6,19 +6,14 @@ import {
   deleteJournal,
 } from "../controllers/journalController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
-
+import { broadcastResourceUpdate } from "../server.js";
 
 const router = express.Router();
 
 // --- Виправлений GET-маршрут ---
 router.get("/", verifyToken, async (req, res, next) => {
   try {
-
     const userId = req.user.uid || req.user.user_id;
-
-    // Тимчасову діагностику (console.log) тепер можна видалити
-    // console.log("Об'єкт req.user після verifyToken:", req.user);
-    // console.log("Використовуваний userId:", userId);
 
     if (!userId) {
       return res.status(401).json({
@@ -55,7 +50,7 @@ router.post("/", verifyToken, async (req, res, next) => {
 
     // Викликаємо функцію DAL
     const result = await addJournal(journalData);
-
+    broadcastResourceUpdate("journals", userId, getJournals);
     // Повертаємо ID новоствореного Журналу
     res.status(201).json({
       message: "Журнал успішно додано",
@@ -70,7 +65,12 @@ router.post("/", verifyToken, async (req, res, next) => {
 router.put("/:id", verifyToken, async (req, res, next) => {
   try {
     const journalId = req.params.id;
-    const userId = req.user.id || req.user._id;
+    const userId = req.user.uid || req.user._id;
+    if (!userId) {
+      return res.status(401).json({
+        message: "Не вдалося визначити ідентифікатор користувача з токена.",
+      });
+    }
 
     // Викликаємо функцію DAL.
     // Примітка: Логіку перевірки userId та journalId слід додати у journalController
@@ -83,7 +83,7 @@ router.put("/:id", verifyToken, async (req, res, next) => {
         .status(404)
         .json({ message: "Журнал не знайдено або недостатньо прав" });
     }
-
+    broadcastResourceUpdate("journals", userId, getJournals);
     res.status(200).json({
       message: "Журнал успішно оновлено",
       modifiedCount: result.modifiedCount,
@@ -97,14 +97,19 @@ router.put("/:id", verifyToken, async (req, res, next) => {
 router.delete("/:id", verifyToken, async (req, res, next) => {
   try {
     const journalId = req.params.id;
-
+    const userId = req.user.uid || req.user._id;
+    if (!userId) {
+      return res.status(401).json({
+        message: "Не вдалося визначити ідентифікатор користувача з токена.",
+      });
+    }
     // Викликаємо функцію DAL.
     const result = await deleteJournal(journalId);
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: "Журнал не знайдено" });
     }
-
+    broadcastResourceUpdate("journals", userId, getJournals);
     res.status(200).json({ message: "Журнал успішно видалено" });
   } catch (err) {
     next(err);

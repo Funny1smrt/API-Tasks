@@ -1,7 +1,7 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
-export async function getNote_components(userId, noteId) {
+export async function getNote_components(userId, reqQuery = {}) {
   const db = getDB();
 
   if (!userId) {
@@ -10,10 +10,13 @@ export async function getNote_components(userId, noteId) {
 
   const query = { userId };
 
-  if (noteId) {
-    query.noteId = noteId;
-  }
+  const nId = reqQuery.noteId;
+  // --- 1. Фільтрація за Journal ID та All Notes ---
 
+  if (nId && nId !== "undefined") {
+    // ВИПАДОК А: Завантажуємо нотатки для КОНКРЕТНОГО ВІДКРИТОГО ЖУРНАЛУ
+    query.noteId = nId;
+  }
 
   const notes = await db
     .collection("note_components")

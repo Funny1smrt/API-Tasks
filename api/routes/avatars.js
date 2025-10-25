@@ -1,5 +1,5 @@
 import multer from "multer";
-import { getAvatar, uploadAvatar } from "../controllers/avatarsController.js";
+import { getAvatar, uploadAvatar } from "../controllers/avatarController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import express from "express";
 

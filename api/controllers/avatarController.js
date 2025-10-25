@@ -4,7 +4,6 @@ export async function getAvatar(userId) {
   const { data, error } = await supabase.storage
     .from("avatars")
     .list(`${userId}/`); // Отримати список, щоб знайти файл
-
   if (error) throw error;
 
   // Якщо немає файлів або папка порожня, повертаємо null
@@ -20,7 +19,6 @@ export async function getAvatar(userId) {
   const { data: urlData } = supabase.storage
     .from("avatars")
     .getPublicUrl(`${userId}/${avatarFile.name}`);
-
   return {
     name: avatarFile.name,
     url: urlData.publicUrl,
