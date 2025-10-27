@@ -6,17 +6,14 @@ import {
   deleteNote,
 } from "../controllers/noteController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import { broadcastResourceUpdate } from "../server.js";
 
 const router = express.Router();
 
-// --- Виправлений GET-маршрут ---
+// GET - отримати нотатки
 router.get("/", verifyToken, async (req, res, next) => {
   try {
-    // Припускаємо, що verifyToken успішно додає інформацію про користувача до req.user
-    // і що у req.user є поле `id` або `_id`
     const userId = req.user.uid || req.user._id;
-    // const journalId = req.query.journalId;
-    // const allNotes = req.query.allNotes;
     const reqQuery = req.query;
 
     if (!userId) {
@@ -25,19 +22,14 @@ router.get("/", verifyToken, async (req, res, next) => {
       });
     }
 
-
-    // Викликаємо функцію доступу до даних (DAL)
     const notes = await getNotes(userId, reqQuery);
-
-    // Відправляємо лише чисті дані (notes), що запобігає BSONError
     res.status(200).json(notes);
   } catch (err) {
-    // Передаємо помилку далі для централізованої обробки
     next(err);
   }
 });
 
-// --- Виправлений POST-маршрут ---
+// POST - створити нотатку
 router.post("/", verifyToken, async (req, res, next) => {
   try {
     const userId = req.user.uid || req.user._id;
@@ -47,19 +39,20 @@ router.post("/", verifyToken, async (req, res, next) => {
         message: "Не вдалося визначити ідентифікатор користувача з токена.",
       });
     }
-    // Створюємо об'єкт для збереження, додаючи userId
+
     const noteData = {
       ...req.body,
       userId: userId,
       createdAt: new Date(),
     };
 
-    // Викликаємо функцію DAL
     const result = await addNote(noteData);
 
-    // Повертаємо ID новоствореного ноту
+    // ✅ ВИПРАВЛЕНО: додано broadcast для real-time оновлення
+    broadcastResourceUpdate("notes", userId, getNotes, req.query);
+
     res.status(201).json({
-      message: "Блок успішно додано",
+      message: "Нотатку успішно додано",
       id: result.insertedId,
     });
   } catch (err) {
@@ -67,25 +60,32 @@ router.post("/", verifyToken, async (req, res, next) => {
   }
 });
 
-// --- Виправлений PUT-маршрут ---
+// PUT - оновити нотатку
 router.put("/:id", verifyToken, async (req, res, next) => {
   try {
     const noteId = req.params.id;
+    const userId = req.user.uid || req.user._id;
 
-    // Викликаємо функцію DAL.
-    // Примітка: Логіку перевірки userId та noteId слід додати у noteController
+    if (!userId) {
+      return res.status(401).json({
+        message: "Не вдалося визначити ідентифікатор користувача з токена.",
+      });
+    }
+
     const updateData = { ...req.body, updatedAt: new Date() };
-
     const result = await updateNote(noteId, updateData);
 
     if (result.matchedCount === 0) {
       return res
         .status(404)
-        .json({ message: "Запис не знайдено або недостатньо прав" });
+        .json({ message: "Нотатку не знайдено або недостатньо прав" });
     }
 
+    // ✅ ВИПРАВЛЕНО: додано broadcast
+    broadcastResourceUpdate("notes", userId, getNotes, req.query);
+
     res.status(200).json({
-      message: "Запис успішно оновлено",
+      message: "Нотатку успішно оновлено",
       modifiedCount: result.modifiedCount,
     });
   } catch (err) {
@@ -93,19 +93,28 @@ router.put("/:id", verifyToken, async (req, res, next) => {
   }
 });
 
-// --- Виправлений DELETE-маршрут ---
+// DELETE - видалити нотатку
 router.delete("/:id", verifyToken, async (req, res, next) => {
   try {
     const noteId = req.params.id;
+    const userId = req.user.uid || req.user._id;
 
-    // Викликаємо функцію DAL.
+    if (!userId) {
+      return res.status(401).json({
+        message: "Не вдалося визначити ідентифікатор користувача з токена.",
+      });
+    }
+
     const result = await deleteNote(noteId);
 
     if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "Запис не знайдено" });
+      return res.status(404).json({ message: "Нотатку не знайдено" });
     }
 
-    res.status(200).json({ message: "Запис успішно видалено" });
+    // ✅ ВИПРАВЛЕНО: додано broadcast
+    await broadcastResourceUpdate("notes", userId, getNotes, req.query);
+
+    res.status(200).json({ message: "Нотатку успішно видалено" });
   } catch (err) {
     next(err);
   }

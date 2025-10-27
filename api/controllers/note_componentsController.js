@@ -16,6 +16,13 @@ export async function getNote_components(userId, reqQuery = {}) {
   if (nId && nId !== "undefined") {
     // ВИПАДОК А: Завантажуємо нотатки для КОНКРЕТНОГО ВІДКРИТОГО ЖУРНАЛУ
     query.noteId = nId;
+  } else if (reqQuery.allNote_components && reqQuery.allNote_components !== "false") {
+    // ВИПАДОК B: Завантажуємо ВСІ нотатки, які ПРИВ'ЯЗАНІ до БУДЬ-ЯКОГО журналу
+    query.noteId = { $exists: true };
+  } else {
+    // ВИПАДОК С: Завантажуємо "ВІЛЬНІ" нотатки (які НЕ належать жодному журналу)
+    // Цей випадок зазвичай використовується для загального списку або "Inbox".
+    return;
   }
 
   const notes = await db

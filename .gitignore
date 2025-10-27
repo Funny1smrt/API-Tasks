@@ -13,7 +13,7 @@ package-lock.json
 .env.production.local
 
 # Firebase service account key
-config/serviceAccountKey.json
+serviceAccountKey.json
 
 # Logs
 logs
