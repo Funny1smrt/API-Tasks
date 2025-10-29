@@ -4,23 +4,23 @@ import { ObjectId } from "mongodb";
 export async function getNotes(userId, reqQuery = {}) {
   const db = getDB();
 
-  if (!userId) {
-    throw new Error("userId обов’язковий");
-  }
-
   const query = { userId };
   const jId = reqQuery.journalId;
-  // --- 1. Фільтрація за Journal ID та All Notes ---
+  const isTask = reqQuery.isTask;
+  console.log("isTask:", isTask);
+  console.log("jId:", jId);
 
   if (jId && jId !== "undefined") {
     // ВИПАДОК А: Завантажуємо нотатки для КОНКРЕТНОГО ВІДКРИТОГО ЖУРНАЛУ
     query.journalId = jId;
+  } else if (isTask === "true") {
+    // ВИПАДОК ДОДАТКОВИЙ: Завантажуємо лише нотатки, які є завданнями
+    query.isTask = true;
   } else if (reqQuery.allNotes && reqQuery.allNotes !== "false") {
     // ВИПАДОК B: Завантажуємо ВСІ нотатки, які ПРИВ'ЯЗАНІ до БУДЬ-ЯКОГО журналу
     query.journalId = { $exists: true };
   } else {
-    // ВИПАДОК С: Завантажуємо "ВІЛЬНІ" нотатки (які НЕ належать жодному журналу)
-    // Цей випадок зазвичай використовується для загального списку або "Inbox".
+    // ВИПАДОК С: Нічого не вказано - не завантажуємо нотатки
     return;
   }
 

@@ -3,7 +3,7 @@ import admin from "firebase-admin";
 
 // Читаємо ключ
 const serviceAccount = JSON.parse(
-  fs.readFileSync(new URL("./serviceAccountKey.json", import.meta.url))
+  fs.readFileSync(new URL("./firebaseKey.json", import.meta.url))
 );
 
 // Ініціалізація Firebase Admin SDK

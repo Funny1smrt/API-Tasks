@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 
 export async function getNote_components(userId, reqQuery = {}) {
   const db = getDB();
-
+  console.log("reqQuery in controller:", reqQuery);
   if (!userId) {
     throw new Error("userId обов’язковий");
   }

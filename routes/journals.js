@@ -50,7 +50,7 @@ router.post("/", verifyToken, async (req, res, next) => {
 
     // Викликаємо функцію DAL
     const result = await addJournal(journalData);
-    broadcastResourceUpdate("journals", userId, getJournals);
+    await broadcastResourceUpdate("journals", userId, getJournals);
     // Повертаємо ID новоствореного Журналу
     res.status(201).json({
       message: "Журнал успішно додано",

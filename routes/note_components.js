@@ -6,6 +6,7 @@ import {
   deleteNote_component,
 } from "../controllers/note_componentsController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
+import { broadcastResourceUpdate } from "../server.js";
 
 const router = express.Router();
 
@@ -53,7 +54,12 @@ router.post("/", verifyToken, async (req, res, next) => {
 
     // Викликаємо функцію DAL
     const result = await addNote_component(note_componentData);
-
+    await broadcastResourceUpdate(
+      "note_components",
+      userId,
+      getNote_components,
+      { noteId: req.body.noteId }
+    );
     // Повертаємо ID новоствореного ноту
     res.status(201).json({
       message: "Блок успішно додано",
@@ -80,7 +86,12 @@ router.put("/:id", verifyToken, async (req, res, next) => {
         .status(404)
         .json({ message: "Запис не знайдено або недостатньо прав" });
     }
-
+    await broadcastResourceUpdate(
+      "note_components",
+      req.userId,
+      getNote_components,
+      req.query
+    );
     res.status(200).json({
       message: "Запис успішно оновлено",
       modifiedCount: result.modifiedCount,
@@ -101,7 +112,12 @@ router.delete("/:id", verifyToken, async (req, res, next) => {
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: "Запис не знайдено" });
     }
-
+    await broadcastResourceUpdate(
+      "note_components",
+      req.userId,
+      getNote_components,
+      req.query
+    );
     res.status(200).json({ message: "Запис успішно видалено" });
   } catch (err) {
     next(err);

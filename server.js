@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { Server } from "socket.io";
-import http from "http";
+import http, { get } from "http";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import taskRoutes from "./routes/tasks.js";
@@ -10,6 +10,7 @@ import note_componentRoutes from "./routes/note_components.js";
 import journalRoutes from "./routes/journals.js";
 import userRoutes from "./routes/users.js";
 import avatarRoutes from "./routes/avatars.js";
+import { getTags } from "./controllers/tagController.js";
 import { getTasks } from "./controllers/taskController.js";
 import { getJournals } from "./controllers/journalController.js";
 import { getNotes } from "./controllers/noteController.js";
@@ -66,6 +67,7 @@ const dataFetchers = {
   notes: getNotes,
   note_components: getNote_components,
   avatars: getAvatar,
+  tags: getTags,
 };
 
 io.on("connection", (socket) => {
