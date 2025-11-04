@@ -1,6 +1,8 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
+// TODO: Доробити Socket.IO для notes
+
 export async function getNotes(userId, reqQuery = {}) {
   const db = getDB();
 

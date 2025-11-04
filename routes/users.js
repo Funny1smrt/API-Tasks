@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import {
   getUsers,
   getUser,
+  addUser,
   updateUser,
   deleteUser,
 } from "../controllers/userController.js";
@@ -19,6 +20,23 @@ const router = express.Router();
 // 🔐 Захищені маршрути
 router.get("/", verifyToken, getUsers);
 router.get("/:id", verifyToken, getUser);
+router.post("/", verifyToken, async (req, res, next) => {
+  try {
+    const userData = {
+      ...req.body,
+      createdAt: new Date(),
+    };
+
+    const result = await addUser(userData);
+
+    res.status(201).json({
+      message: "Користувач успішно додано",
+      id: result.insertedId,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 router.put("/:id", verifyToken, updateUser);
 router.delete("/:id", verifyToken, deleteUser);
 

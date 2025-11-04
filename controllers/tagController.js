@@ -1,5 +1,8 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
+
+// TODO: Доробити tags
+
 export async function getTags(userId) {
   const db = getDB();
   const tags = await db.collection("tags").find({ userId }).toArray();

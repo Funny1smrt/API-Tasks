@@ -12,7 +12,11 @@ export async function getUser(userId) {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     return user;
 }
-
+export async function addUser(user) {
+    const db = getDB();
+    const result = await db.collection("users").insertOne(user);
+    return result;
+}
 export async function updateUser(userId, updateData) {
     const db = getDB();
     const result = await db

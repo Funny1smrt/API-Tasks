@@ -1,6 +1,7 @@
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
+// TODO: Доробити Socket.IO для note_components
 export async function getNote_components(userId, reqQuery = {}) {
   const db = getDB();
   console.log("reqQuery in controller:", reqQuery);

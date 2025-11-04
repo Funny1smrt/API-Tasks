@@ -18,6 +18,8 @@ import { getNote_components } from "./controllers/note_componentsController.js";
 import { getAvatar } from "./controllers/avatarController.js";
 import { verifyTokenUserId } from "./middleware/authMiddleware.js";
 
+// TODO: Перевірити і доробити broadcastResourceUpdate для всіх ресурсів
+
 dotenv.config();
 
 const app = express();
@@ -34,6 +36,7 @@ export const io = new Server(server, {
       "http://localhost:3000",
       "http://localhost:5000",
       "http://192.168.50.88:5173",
+      "http://192.168.50.90:5173",
       "http://192.168.50.88:3000",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
